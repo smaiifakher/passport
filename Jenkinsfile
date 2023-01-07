@@ -7,34 +7,42 @@ pipeline {
                     checkout([$class: 'GitSCM', branches: [[name: '*/master']],
                         userRemoteConfigs: [[
                             credentialsId: '312f845b-c93f-40bf-989e-b0db8200e41a',
-                            url: 'https://github.com/smaiifakher/angular-ci-jenkins']]])
+                            url: 'https://github.com/smaiifakher/passport']]])
                 }
             }
         }
-        stage('Install') {
+        stage('Composer') {
              steps{
+                script{
+                    sh "composer install"
+                }
+            }
+        }
+        stage('Npm') {
+            steps{
                 script{
                     sh "npm install"
                 }
             }
         }
-        stage('Version') {
-            steps{
-                script{
-                    sh "ng version"
-                }
-            }
-        }
         stage ('code quality'){
             steps{
-                sh 'ng lint'
+                sh 'cp .env.example .env'
+            }
+        }
+
+        stage('Generate') {
+            steps{
+                script{
+                    sh "php artisan key:generate"
+                }
             }
         }
 
         stage('Serve') {
             steps{
                 script{
-                    sh "ng build"
+                    sh "php artisan serve"
                 }
             }
         }
